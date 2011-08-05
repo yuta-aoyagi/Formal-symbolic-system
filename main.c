@@ -17,9 +17,9 @@
  * allocate dynamic memory @a size bytes, and return a pointer to it.
  *
  * メモリの確保に失敗した場合, NULLが返されるか, またはプログラムが終了する.
- * if fail allocating memory, reuturn NULL or make the program exit.
+ * if fail to allocate memory, reuturn NULL or make the program exit.
  * @param[in] size 確保するメモリの大きさ. the size of memory to be allocated.
- * @retval NULL 確保に失敗したとき. when fail to allocate.
+ * @retval NULL メモリの確保に失敗したとき. when fail to allocate memory.
  * @retval !=NULL 確保されたメモリへのポインタ. a pointer to the allocated memory.
  */
 void *my_malloc(size_t size) {
