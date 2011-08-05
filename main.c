@@ -7,6 +7,8 @@
 
 #include <guigui01.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <string.h>
 
 /* ************************************************
  *  ライブラリ補完. the complement to poor library.
@@ -38,8 +40,46 @@ void my_free(void *ptr) {
  *  プログラム本体. the main part of the program.
  * ************************************************ */
 
+/**
+ * @brief グローバル変数の代わりに使う作業領域の型.
+ * a type of working area used instead of global variables.
+ */
+struct WORK {
+	char *syntax_file;	///< 文法定義ファイルの内容. the content of the syntax file.
+};
+
 /// g01_bss1a1 が指す領域の大きさ. the size of the area g01_bss1a1 pointing.
 #define BSS_SIZE (2 * 1024 * 1024)
+
+/**
+ * @brief コマンドラインで与えられたファイルを読む. read a file given from command line.
+ *
+ * @a arg_no 番目のコマンドライン引数で与えられたファイルを開き, その内容を一時領域に読み込んで,
+ * ::my_malloc で確保されるバッファのコピーへのポインタを返す.
+ * open the file given @a arg_no -th command line argument, read its content to the temporary buffer,
+ * and return a pointer to its copy allocated by ::my_malloc.
+ *
+ * ファイルオープンと読み込みのいずれかに失敗すると, プログラムは終了する.
+ * バッファの確保に失敗すると, NULLを返すかプログラムが終了する.
+ * if fail to open the file or to read it, make the program exit.
+ * if fail to allocate buffer, return NULL or make the program exit.
+ * @param[in] arg_no コマンドライン引数の番号. the number in command line argument.
+ * @retval NULL バッファの確保に失敗したとき. when fail to allocate buffer.
+ * @retval !=NULL ファイルの内容へのポインタ. これは ::read_file の呼び出し側が開放しなければならない.
+ * a pointer to the content of the file. all code calling ::read_file must release the area.
+ */
+static void *read_file(int arg_no) {
+	char *buf, *bss = g01_bss1a1;
+	int len;
+	g01_getcmdlin_fopen_s_0_4(arg_no);
+	len = jg01_fread1f_4(BSS_SIZE, bss);
+	buf = my_malloc(len + 1);
+	if (buf != NULL) {
+		memcpy(buf, bss, len);
+		buf[len] = '\0';
+	}
+	return buf;
+}
 
 /**
  * @brief メイン関数. the main function.
@@ -48,14 +88,14 @@ void my_free(void *ptr) {
  * It just print the content of the input file and exit successfully now.
  */
 void G01Main(void) {
+	struct WORK w;
 	static const unsigned char cmdusage[] = {
 		0x86, 0x50,
 		0x00, 's', 0x0c, 6, 's', 'y', 'n', 't', 'a', 'x',
 		0x40,
 	};
-	char *b = g01_bss1a1;
 	g01_setcmdlin(cmdusage);
-	g01_getcmdlin_fopen_s_0_4(0);
-	jg01_fread0_4(BSS_SIZE, b);
-	g01_putstr0(b);
+	w.syntax_file = read_file(0);
+	g01_putstr0(w.syntax_file);
+	my_free(w.syntax_file);
 }
