@@ -7,6 +7,9 @@
 
 #include <guigui01.h>
 
+/// g01_bss1a1 が指す領域の大きさ. the size of the area g01_bss1a1 pointing.
+#define BSS_SIZE (2 * 1024 * 1024)
+
 /**
  * @brief メイン関数. the main function.
  * @note
@@ -22,6 +25,6 @@ void G01Main(void) {
 	char *b = g01_bss1a1;
 	g01_setcmdlin(cmdusage);
 	g01_getcmdlin_fopen_s_0_4(0);
-	jg01_fread0_4(2 * 1024 * 1024, b);
+	jg01_fread0_4(BSS_SIZE, b);
 	g01_putstr0(b);
 }
