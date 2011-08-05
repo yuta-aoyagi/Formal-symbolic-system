@@ -82,6 +82,23 @@ static void *read_file(int arg_no) {
 }
 
 /**
+ * @brief プログラムの初期化処理. initialize the program.
+ *
+ * コマンドライン引数の設定を行い, 文法定義ファイルを読む.
+ * configure command line arguments, and read the syntax file.
+ * @param[out] pw 作業領域へのポインタ. a pointer to the working area.
+ */
+static void init(struct WORK *pw) {
+	static const unsigned char cmdusage[] = {
+		0x86, 0x50,
+		0x00, 's', 0x0c, 6, 's', 'y', 'n', 't', 'a', 'x',
+		0x40,
+	};
+	g01_setcmdlin(cmdusage);
+	pw->syntax_file = read_file(0);
+}
+
+/**
  * @brief メイン関数. the main function.
  * @note
  * 現在はただ入力ファイルをダンプし正常終了するだけの処理しかない.
@@ -89,13 +106,7 @@ static void *read_file(int arg_no) {
  */
 void G01Main(void) {
 	struct WORK w;
-	static const unsigned char cmdusage[] = {
-		0x86, 0x50,
-		0x00, 's', 0x0c, 6, 's', 'y', 'n', 't', 'a', 'x',
-		0x40,
-	};
-	g01_setcmdlin(cmdusage);
-	w.syntax_file = read_file(0);
+	init(&w);
 	g01_putstr0(w.syntax_file);
 	my_free(w.syntax_file);
 }
